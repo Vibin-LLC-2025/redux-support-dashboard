@@ -1,0 +1,13 @@
+{
+  "name": "redux-support-dashboard",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Full-stack support-ticket dashboard — React + Redux Toolkit + Express",
+  "scripts": {
+    "dev": "concurrently -n server,client -c blue,green \"npm --prefix server start\" \"npm --prefix client run dev\"",
+    "install:all": "npm --prefix server install && npm --prefix client install"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
