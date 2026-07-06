@@ -1,4 +1,6 @@
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { selectVisibleTickets } from "../../selectors";
+import { selectAllTickets } from "./ticketsSlice";
 import {
   filtersCleared,
   priorityFilterChanged,
@@ -11,11 +13,13 @@ import type { PriorityFilter, StatusFilter } from "../filters/filtersSlice";
 export function TicketFilters() {
   const dispatch = useAppDispatch();
   const filters = useAppSelector(selectFilters);
+  const visible = useAppSelector(selectVisibleTickets).length;
+  const total = useAppSelector(selectAllTickets).length;
 
   return (
     <div className="filters">
       <input
-        className="filters-search"
+        className="filter-search"
         type="search"
         placeholder="Search subject, requester, assignee…"
         value={filters.search}
@@ -23,13 +27,11 @@ export function TicketFilters() {
         aria-label="Search tickets"
       />
 
-      <label className="filters-field">
+      <label className="filter-field">
         Status
         <select
           value={filters.status}
-          onChange={(e) =>
-            dispatch(statusFilterChanged(e.target.value as StatusFilter))
-          }
+          onChange={(e) => dispatch(statusFilterChanged(e.target.value as StatusFilter))}
         >
           <option value="all">All</option>
           <option value="open">Open</option>
@@ -38,13 +40,11 @@ export function TicketFilters() {
         </select>
       </label>
 
-      <label className="filters-field">
+      <label className="filter-field">
         Priority
         <select
           value={filters.priority}
-          onChange={(e) =>
-            dispatch(priorityFilterChanged(e.target.value as PriorityFilter))
-          }
+          onChange={(e) => dispatch(priorityFilterChanged(e.target.value as PriorityFilter))}
         >
           <option value="all">All</option>
           <option value="urgent">Urgent</option>
@@ -54,9 +54,13 @@ export function TicketFilters() {
         </select>
       </label>
 
-      <button className="btn-ghost" onClick={() => dispatch(filtersCleared())}>
+      <button className="btn btn-ghost" onClick={() => dispatch(filtersCleared())}>
         Clear
       </button>
+
+      <span className="filter-count" aria-live="polite">
+        {visible} of {total} shown
+      </span>
     </div>
   );
 }

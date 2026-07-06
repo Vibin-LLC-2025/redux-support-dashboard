@@ -1,5 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit";
-import type { Ticket, TicketPriority } from "./types";
+import type { Ticket, TicketPriority, TicketStatus } from "./types";
 import { selectAllTickets } from "./features/tickets/ticketsSlice";
 import { selectFilters } from "./features/filters/filtersSlice";
 
@@ -9,6 +9,41 @@ const PRIORITY_RANK: Record<TicketPriority, number> = {
   medium: 2,
   low: 1,
 };
+
+const PRIORITY_ORDER: TicketPriority[] = ["urgent", "high", "medium", "low"];
+const STATUS_ORDER: TicketStatus[] = ["open", "pending", "resolved"];
+
+export interface PriorityBacklog {
+  priority: TicketPriority;
+  count: number;
+}
+export interface StatusSlice {
+  status: TicketStatus;
+  count: number;
+}
+
+// Backlog = active (not-yet-resolved) tickets bucketed by priority, urgent→low.
+// Memoized: recomputes only when the ticket set changes.
+export const selectBacklogByPriority = createSelector(
+  [selectAllTickets],
+  (tickets): PriorityBacklog[] =>
+    PRIORITY_ORDER.map((priority) => ({
+      priority,
+      count: tickets.filter(
+        (t) => t.priority === priority && t.status !== "resolved"
+      ).length,
+    }))
+);
+
+// Status pipeline = every ticket bucketed by status, for the segmented bar.
+export const selectStatusPipeline = createSelector(
+  [selectAllTickets],
+  (tickets): StatusSlice[] =>
+    STATUS_ORDER.map((status) => ({
+      status,
+      count: tickets.filter((t) => t.status === status).length,
+    }))
+);
 
 // KPI cards derive entirely from raw ticket state — recomputed only when the
 // ticket list actually changes, thanks to createSelector memoization.

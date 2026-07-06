@@ -2,24 +2,17 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { selectVisibleTickets } from "../../selectors";
 import { selectFilters, sortChanged } from "../filters/filtersSlice";
 import type { SortField } from "../filters/filtersSlice";
-import { deleteTicket, updateTicket } from "./ticketsSlice";
-import type { TicketStatus } from "../../types";
+import { PriorityTag } from "./indicators";
+import { StatusControl } from "./StatusControl";
+import { DeleteButton } from "./DeleteButton";
+import { ageLabel, fullTimestamp } from "./age";
 
-const COLUMNS: { field: SortField; label: string }[] = [
-  { field: "subject", label: "Subject" },
-  { field: "priority", label: "Priority" },
-  { field: "status", label: "Status" },
-  { field: "createdAt", label: "Opened" },
+const COLUMNS: { field: SortField; label: string; cls: string }[] = [
+  { field: "priority", label: "Priority", cls: "col-pri" },
+  { field: "subject", label: "Subject", cls: "" },
+  { field: "status", label: "Status", cls: "col-status" },
+  { field: "createdAt", label: "Opened", cls: "col-when" },
 ];
-
-const STATUSES: TicketStatus[] = ["open", "pending", "resolved"];
-
-function ageLabel(iso: string): string {
-  const hours = Math.round((Date.now() - new Date(iso).getTime()) / 3600_000);
-  if (hours < 1) return "just now";
-  if (hours < 24) return `${hours}h ago`;
-  return `${Math.round(hours / 24)}d ago`;
-}
 
 export function TicketTable() {
   const dispatch = useAppDispatch();
@@ -28,7 +21,7 @@ export function TicketTable() {
 
   return (
     <table className="ticket-table">
-      <caption className="sr-only">Support tickets</caption>
+      <caption className="sr-only">Support tickets, sortable by column</caption>
       <thead>
         <tr>
           {COLUMNS.map((col) => {
@@ -36,67 +29,36 @@ export function TicketTable() {
             return (
               <th
                 key={col.field}
+                className={col.cls}
                 aria-sort={active ? (sortDir === "asc" ? "ascending" : "descending") : "none"}
               >
                 <button className="th-sort" onClick={() => dispatch(sortChanged(col.field))}>
                   {col.label}
-                  <span className="th-arrow">{active ? (sortDir === "asc" ? "▲" : "▼") : ""}</span>
+                  <span className="th-arrow" aria-hidden="true">{active ? (sortDir === "asc" ? "▲" : "▼") : ""}</span>
                 </button>
               </th>
             );
           })}
-          <th>Assignee</th>
-          <th aria-label="Actions" />
+          <th className="col-req">Requester</th>
+          <th className="col-assn">Assignee</th>
+          <th className="col-act"><span className="sr-only">Actions</span></th>
         </tr>
       </thead>
       <tbody>
-        {rows.length === 0 && (
-          <tr>
-            <td colSpan={6} className="empty">
-              No tickets match the current filters.
+        {rows.map((t, i) => (
+          <tr key={t.id} className="reveal-row" style={{ "--i": i } as React.CSSProperties}>
+            <td className="col-pri"><PriorityTag priority={t.priority} /></td>
+            <td className="cell-subject" title={t.subject}>{t.subject}</td>
+            <td className="col-status"><StatusControl ticket={t} /></td>
+            <td className="col-when cell-when">
+              <span title={fullTimestamp(t.createdAt)}>{ageLabel(t.createdAt)}</span>
             </td>
-          </tr>
-        )}
-        {rows.map((t) => (
-          <tr key={t.id}>
-            <td className="cell-subject">
-              <span className="subject">{t.subject}</span>
-              <span className="requester">{t.requester}</span>
+            <td className="col-req cell-req">{t.requester}</td>
+            <td className="col-assn cell-assn" data-unassigned={t.assignee === null}>
+              {t.assignee ?? "Unassigned"}
             </td>
-            <td>
-              <span className={`badge prio-${t.priority}`}>{t.priority}</span>
-            </td>
-            <td>
-              <select
-                className={`status-select status-${t.status}`}
-                value={t.status}
-                onChange={(e) =>
-                  dispatch(
-                    updateTicket({
-                      id: t.id,
-                      patch: { status: e.target.value as TicketStatus },
-                    })
-                  )
-                }
-                aria-label={`Status for ${t.subject}`}
-              >
-                {STATUSES.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
-            </td>
-            <td className="cell-age">{ageLabel(t.createdAt)}</td>
-            <td className="cell-assignee">{t.assignee ?? "—"}</td>
-            <td>
-              <button
-                className="btn-ghost btn-danger"
-                onClick={() => dispatch(deleteTicket(t.id))}
-                aria-label={`Delete ${t.subject}`}
-              >
-                ✕
-              </button>
+            <td className="col-act row-actions">
+              <DeleteButton ticket={t} variant="icon" />
             </td>
           </tr>
         ))}

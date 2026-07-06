@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { createTicket, selectTicketsStatus } from "./ticketsSlice";
+import { AlertIcon } from "../../components/icons";
 import type { TicketPriority } from "../../types";
 
 const PRIORITIES: TicketPriority[] = ["low", "medium", "high", "urgent"];
 
-export function NewTicketForm() {
+export function NewTicketForm({ onCreated }: { onCreated?: () => void }) {
   const dispatch = useAppDispatch();
   const status = useAppSelector(selectTicketsStatus);
   const [subject, setSubject] = useState("");
@@ -19,11 +20,12 @@ export function NewTicketForm() {
     setError(null);
     setSubmitting(true);
     try {
-      // unwrap() rethrows the thunk's rejection so the form can show it.
+      // unwrap() rethrows the thunk's rejection so the form can surface it.
       await dispatch(createTicket({ subject, requester, priority })).unwrap();
       setSubject("");
       setRequester("");
       setPriority("medium");
+      onCreated?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not create ticket");
     } finally {
@@ -33,34 +35,53 @@ export function NewTicketForm() {
 
   return (
     <form className="new-ticket" onSubmit={handleSubmit}>
-      <h2>New ticket</h2>
-      <input
-        placeholder="Subject (min 3 chars)"
-        value={subject}
-        onChange={(e) => setSubject(e.target.value)}
-        aria-label="Subject"
-      />
-      <input
-        placeholder="Requester"
-        value={requester}
-        onChange={(e) => setRequester(e.target.value)}
-        aria-label="Requester"
-      />
-      <select
-        value={priority}
-        onChange={(e) => setPriority(e.target.value as TicketPriority)}
-        aria-label="Priority"
-      >
-        {PRIORITIES.map((p) => (
-          <option key={p} value={p}>
-            {p}
-          </option>
-        ))}
-      </select>
-      <button type="submit" className="btn-primary" disabled={submitting || status === "loading"}>
+      <div className="field">
+        <label htmlFor="nt-subject">Subject</label>
+        <input
+          id="nt-subject"
+          placeholder="Short summary of the issue"
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+        />
+        <span className="field-hint">Minimum 3 characters.</span>
+      </div>
+
+      <div className="field">
+        <label htmlFor="nt-requester">Requester</label>
+        <input
+          id="nt-requester"
+          placeholder="Who reported it"
+          value={requester}
+          onChange={(e) => setRequester(e.target.value)}
+        />
+      </div>
+
+      <div className="field">
+        <label htmlFor="nt-priority">Priority</label>
+        <select
+          id="nt-priority"
+          value={priority}
+          onChange={(e) => setPriority(e.target.value as TicketPriority)}
+          style={{ textTransform: "capitalize" }}
+        >
+          {PRIORITIES.map((p) => (
+            <option key={p} value={p}>
+              {p}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {error && (
+        <p className="form-error" role="alert">
+          <AlertIcon size={16} />
+          {error}
+        </p>
+      )}
+
+      <button type="submit" className="btn btn-primary" disabled={submitting || status === "loading"}>
         {submitting ? "Adding…" : "Add ticket"}
       </button>
-      {error && <p className="form-error" role="alert">{error}</p>}
     </form>
   );
 }
