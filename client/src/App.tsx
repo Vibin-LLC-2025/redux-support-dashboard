@@ -13,13 +13,18 @@ import { TicketList } from "./features/tickets/TicketList";
 import { NewTicketForm } from "./features/tickets/NewTicketForm";
 import { SlideOver } from "./components/SlideOver";
 import { DashboardSkeleton, ErrorState } from "./components/Skeletons";
-import { PlusIcon } from "./components/icons";
+import { BuildNotes } from "./components/BuildNotes";
+import { PanelNote } from "./components/PanelNote";
+import { notesToggled, selectNotesVisible } from "./features/ui/uiSlice";
+import { EyeIcon, EyeOffIcon, InfoIcon, PlusIcon } from "./components/icons";
 
 export default function App() {
   const dispatch = useAppDispatch();
   const status = useAppSelector(selectTicketsStatus);
   const error = useAppSelector(selectTicketsError);
   const [showNew, setShowNew] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
+  const notesVisible = useAppSelector(selectNotesVisible);
 
   // Load tickets once on mount via the async thunk.
   useEffect(() => {
@@ -48,8 +53,31 @@ export default function App() {
             <span className="live-dot" data-down={down} />
             <span className="live-text">{down ? "API offline" : "API live · :4000"}</span>
           </span>
-          <button className="btn btn-primary" onClick={() => setShowNew(true)}>
-            <PlusIcon /> New ticket
+          <button
+            className="btn btn-ghost"
+            data-active={notesVisible}
+            onClick={() => dispatch(notesToggled())}
+            aria-pressed={notesVisible}
+            aria-label={notesVisible ? "Hide inline build notes" : "Show inline build notes"}
+          >
+            {notesVisible ? <EyeIcon /> : <EyeOffIcon />}
+            <span className="btn-label">Notes</span>
+          </button>
+          <button
+            className="btn btn-ghost"
+            onClick={() => setShowAbout(true)}
+            aria-label="About this build"
+          >
+            <InfoIcon size={15} />
+            <span className="btn-label">About</span>
+          </button>
+          <button
+            className="btn btn-primary"
+            onClick={() => setShowNew(true)}
+            aria-label="New ticket"
+          >
+            <PlusIcon />
+            <span className="btn-label">New ticket</span>
           </button>
         </div>
       </header>
@@ -65,6 +93,11 @@ export default function App() {
               <StatusPipeline />
             </div>
             <div className="list-panel reveal" style={{ "--i": 8 } as React.CSSProperties}>
+              <PanelNote api="createEntityAdapter + filters slice">
+                Rows come from the normalized ticket store; the search box, both dropdowns, and
+                the sortable headers only write to the filters slice. The list you see is derived
+                from the two together, never stored.
+              </PanelNote>
               <TicketFilters />
               <TicketList />
             </div>
@@ -77,6 +110,12 @@ export default function App() {
       {showNew && (
         <SlideOver title="New ticket" onClose={() => setShowNew(false)}>
           <NewTicketForm onCreated={() => setShowNew(false)} />
+        </SlideOver>
+      )}
+
+      {showAbout && (
+        <SlideOver title="About this build" onClose={() => setShowAbout(false)} wide>
+          <BuildNotes />
         </SlideOver>
       )}
     </div>

@@ -1,5 +1,6 @@
 import { useAppSelector } from "../../app/hooks";
 import { selectKpis } from "../../selectors";
+import { PanelNote } from "../../components/PanelNote";
 
 type Tone = "neutral" | "accent" | "warn" | "danger" | "good";
 
@@ -27,27 +28,33 @@ export function StatCards() {
   ];
 
   return (
-    <section className="kpi-row" aria-label="Support metrics">
-      {cards.map((c, i) => (
-        <div
-          key={c.label}
-          className="kpi-tile reveal"
-          data-tone={c.tone}
-          style={{ "--i": i } as React.CSSProperties}
-        >
-          <div className="kpi-head">
-            <span className="kpi-dot" />
-            <span className="kpi-label">{c.label}</span>
-          </div>
-          <span className="kpi-value">{c.value}</span>
-          <span className="kpi-context">{c.context}</span>
-          {c.meter !== undefined && (
-            <div className="kpi-meter" aria-hidden="true">
-              <div className="kpi-meter-fill" style={{ width: `${Math.round(c.meter * 100)}%` }} />
+    <section aria-label="Support metrics">
+      <PanelNote api="createSelector">
+        All six tiles are derived from the ticket list at read time and memoized — no component
+        keeps its own running count, so none of them can fall out of sync.
+      </PanelNote>
+      <div className="kpi-row">
+        {cards.map((c, i) => (
+          <div
+            key={c.label}
+            className="kpi-tile reveal"
+            data-tone={c.tone}
+            style={{ "--i": i } as React.CSSProperties}
+          >
+            <div className="kpi-head">
+              <span className="kpi-dot" />
+              <span className="kpi-label">{c.label}</span>
             </div>
-          )}
-        </div>
-      ))}
+            <span className="kpi-value">{c.value}</span>
+            <span className="kpi-context">{c.context}</span>
+            {c.meter !== undefined && (
+              <div className="kpi-meter" aria-hidden="true">
+                <div className="kpi-meter-fill" style={{ width: `${Math.round(c.meter * 100)}%` }} />
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
     </section>
   );
 }

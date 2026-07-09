@@ -7,10 +7,12 @@ import { CloseIcon } from "./icons";
 export function SlideOver({
   title,
   onClose,
+  wide = false,
   children,
 }: {
   title: string;
   onClose: () => void;
+  wide?: boolean;
   children: React.ReactNode;
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
@@ -60,7 +62,13 @@ export function SlideOver({
   return (
     <>
       <div className="scrim" onClick={onClose} />
-      <div className="slideover" role="dialog" aria-modal="true" aria-label={title} ref={panelRef}>
+      <div
+        className={wide ? "slideover slideover-wide" : "slideover"}
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        ref={panelRef}
+      >
         <div className="slideover-head">
           <h2>{title}</h2>
           <button className="btn-icon slideover-close" onClick={onClose} aria-label="Close panel">

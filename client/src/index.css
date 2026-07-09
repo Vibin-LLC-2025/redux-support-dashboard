@@ -156,6 +156,38 @@ button { font-family: inherit; }
 }
 
 /* =========================================================================
+   Build notes — inline annotations pinned under a panel heading
+   ========================================================================= */
+.panel-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin: 0 0 12px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--muted);
+  max-width: 76ch;      /* keep the measure readable in wide panels */
+}
+.panel-note-icon {
+  color: var(--accent);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.panel-note-api,
+.panel-note-inline {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1px 5px;
+  white-space: nowrap;
+}
+/* inside a chart header the note sits below the sub-line, not above the chart */
+.chart-head .panel-note { margin: 9px 0 0; }
+
+/* =========================================================================
    KPI stat tiles
    ========================================================================= */
 .kpi-row {
@@ -567,6 +599,13 @@ tr:hover .btn-icon, tr:focus-within .btn-icon { opacity: 1; }
   background: var(--panel); border-color: var(--line-strong); color: var(--muted);
 }
 .btn-ghost:hover { color: var(--text); border-color: var(--faint); }
+/* toggle in its on-state: accent ink, never color alone — the eye icon flips too */
+.btn-ghost[data-active="true"] {
+  color: var(--accent);
+  border-color: rgba(77, 181, 255, 0.45);
+  background: var(--accent-dim);
+}
+.btn-ghost[data-active="true"]:hover { color: #6cc2ff; border-color: var(--accent); }
 
 /* =========================================================================
    Slide-over: New ticket
@@ -595,6 +634,77 @@ tr:hover .btn-icon, tr:focus-within .btn-icon { opacity: 1; }
 .slideover-body { padding: 20px; overflow-y: auto; }
 @keyframes slide-in { from { transform: translateX(100%); } }
 @keyframes fade-in { from { opacity: 0; } }
+
+.slideover-wide { width: min(560px, 94vw); }
+
+/* =========================================================================
+   Slide-over: About this build
+   ========================================================================= */
+.build-notes { display: flex; flex-direction: column; gap: 24px; }
+
+.bn-lede {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text);
+  padding-left: 12px;
+  border-left: 2px solid var(--accent);
+}
+
+.bn-section { display: flex; flex-direction: column; gap: 11px; }
+.bn-h {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.09em;
+  text-transform: uppercase; color: var(--muted);
+}
+.bn-body {
+  margin: 0;
+  font-size: 13px; line-height: 1.62;
+  color: var(--muted);
+}
+
+.bn-strong { color: var(--text); font-weight: 600; }
+
+.bn-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.bn-item { display: flex; flex-direction: column; gap: 6px; }
+.bn-text { font-size: 13px; line-height: 1.62; color: var(--muted); }
+
+.bn-api {
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-size: 11.5px; font-weight: 500;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid rgba(77, 181, 255, 0.28);
+  border-radius: 5px;
+  padding: 3px 8px;
+}
+
+.bn-route {
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 3px 8px;
+}
+/* verb carries the color; the path stays neutral ink */
+.bn-route b { font-weight: 600; margin-right: 2px; }
+.bn-route[data-verb="get"] b    { color: var(--st-open); }
+.bn-route[data-verb="post"] b   { color: var(--st-resolved); }
+.bn-route[data-verb="patch"] b  { color: var(--st-pending); }
+.bn-route[data-verb="delete"] b { color: var(--pri-urgent); }
+
+/* code spans inside prose: quieter than the badges above */
+.bn-inline {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text);
+  background: var(--panel-2);
+  border-radius: 3px;
+  padding: 1px 4px;
+}
 
 .new-ticket { display: flex; flex-direction: column; gap: 14px; }
 .field { display: flex; flex-direction: column; gap: 6px; }
@@ -679,6 +789,8 @@ tr:hover .btn-icon, tr:focus-within .btn-icon { opacity: 1; }
   .live-text { display: none; }          /* compact to a dot on mobile */
   .live-pill { padding: 6px; }
   .topbar-right { gap: 8px; }
+  .btn-label { display: none; }          /* both topbar buttons collapse to icons */
+  .btn { padding: 8px 10px; }
 
   /* table -> cards */
   .ticket-table { display: none; }

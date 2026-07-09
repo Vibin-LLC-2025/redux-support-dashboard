@@ -1,6 +1,7 @@
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { selectStatusPipeline } from "../../selectors";
 import { selectFilters, statusFilterChanged } from "../filters/filtersSlice";
+import { PanelNote } from "../../components/PanelNote";
 
 // Status pipeline — one segmented bar showing the whole ticket set split by
 // status (open/pending/resolved), 2px surface gaps between segments. A legend
@@ -16,6 +17,11 @@ export function StatusPipeline() {
       <header className="chart-head">
         <h2 className="chart-title">Status pipeline</h2>
         <p className="chart-sub">Share of all tickets by state</p>
+        <PanelNote api="selectStatusPipeline">
+          The same ticket list, bucketed by status instead. Segments and legend rows both
+          dispatch <code className="panel-note-inline">statusFilterChanged</code>, which is why
+          the table below reacts to either one.
+        </PanelNote>
       </header>
 
       <div className="pipeline-bar" role="group" aria-label="Ticket status distribution — select to filter">

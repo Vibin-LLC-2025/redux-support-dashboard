@@ -30,6 +30,29 @@ export const CloseIcon = ({ size = 18, className }: IconProps) => (
   </svg>
 );
 
+export const InfoIcon = ({ size = 13, className }: IconProps) => (
+  <svg {...base(size)} strokeWidth={2.2} className={className} aria-hidden="true">
+    <circle cx="12" cy="12" r="10" />
+    <line x1="12" y1="11" x2="12" y2="16" />
+    <line x1="12" y1="8" x2="12.01" y2="8" />
+  </svg>
+);
+
+export const EyeIcon = ({ size = 15, className }: IconProps) => (
+  <svg {...base(size)} className={className} aria-hidden="true">
+    <path d="M1.5 12S5 5.5 12 5.5 22.5 12 22.5 12 19 18.5 12 18.5 1.5 12 1.5 12z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
+export const EyeOffIcon = ({ size = 15, className }: IconProps) => (
+  <svg {...base(size)} className={className} aria-hidden="true">
+    <path d="M9.9 5.7A9.6 9.6 0 0 1 12 5.5c7 0 10.5 6.5 10.5 6.5a17 17 0 0 1-3.2 4" />
+    <path d="M6.3 7.8A17 17 0 0 0 1.5 12S5 18.5 12 18.5a9.7 9.7 0 0 0 4-.8" />
+    <line x1="3" y1="3" x2="21" y2="21" />
+  </svg>
+);
+
 export const InboxIcon = ({ size = 34, className }: IconProps) => (
   <svg {...base(size)} strokeWidth={1.5} className={className} aria-hidden="true">
     <polyline points="22 12 16 12 14 15 10 15 8 12 2 12" />

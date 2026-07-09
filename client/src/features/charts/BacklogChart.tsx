@@ -2,6 +2,7 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { selectBacklogByPriority } from "../../selectors";
 import { priorityFilterChanged, selectFilters } from "../filters/filtersSlice";
 import { PriorityGlyphInline } from "./chartGlyph";
+import { PanelNote } from "../../components/PanelNote";
 
 // Backlog by priority — horizontal bars. Bars follow the validated priority
 // ladder colors; length encodes active-ticket count. Each bar is a filter
@@ -18,6 +19,11 @@ export function BacklogChart() {
       <header className="chart-head">
         <h2 className="chart-title">Backlog by priority</h2>
         <p className="chart-sub">Active tickets (not yet resolved) · click to filter</p>
+        <PanelNote api="selectBacklogByPriority">
+          A memoized selector buckets the tickets by priority. Clicking a bar dispatches{" "}
+          <code className="panel-note-inline">priorityFilterChanged</code> — the chart is a
+          control, not just a picture.
+        </PanelNote>
       </header>
 
       <div className="backlog">
