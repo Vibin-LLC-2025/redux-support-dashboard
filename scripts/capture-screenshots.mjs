@@ -41,19 +41,25 @@ async function main() {
 
     const browser = await chromium.launch();
     const page = await browser.newPage({ viewport: { width: 1360, height: 860 } });
+    // Disable animations for deterministic captures
+    await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto(APP_URL, { waitUntil: "networkidle" });
+    await page.addStyleTag({ content: `* { animation: none !important; transition: none !important; }` });
+    // Wait for the ticket table to fully render 8 rows
+    await page.waitForSelector(".ticket-table tbody tr");
+    await page.waitForFunction(() => document.querySelectorAll(".ticket-table tbody tr").length === 8);
 
     // Desktop dashboard
-    await delay(400); // allow initial reveal animations
+    await delay(50);
     await page.screenshot({ path: join(OUT_DIR, "dashboard-desktop.png"), fullPage: true });
 
     // About panel open
     await page.getByRole("button", { name: "About this build" }).click();
     await page.waitForSelector(".build-notes");
-    await delay(200);
+    await delay(50);
     await page.screenshot({ path: join(OUT_DIR, "about-panel.png"), fullPage: true });
     // Close About
-    await page.getByRole("button", { name: "Close" }).click().catch(() => {});
+    await page.getByRole("button", { name: "Close panel" }).click().catch(() => {});
 
     // Ensure notes are on, then capture
     const notesBtn = page.getByRole("button", { name: "Inline build notes" });
@@ -61,12 +67,12 @@ async function main() {
     if (pressed !== "true") {
       await notesBtn.click();
     }
-    await delay(150);
+    await delay(50);
     await page.screenshot({ path: join(OUT_DIR, "notes-on.png"), fullPage: true });
 
     // Mobile view
     await page.setViewportSize({ width: 375, height: 812 });
-    await delay(200);
+    await delay(50);
     await page.screenshot({ path: join(OUT_DIR, "dashboard-mobile.png"), fullPage: true });
 
     await browser.close();
