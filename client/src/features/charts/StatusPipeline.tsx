@@ -19,7 +19,7 @@ export function StatusPipeline() {
         <p className="chart-sub">Share of all tickets by state</p>
         <PanelNote api="selectStatusPipeline">
           The same ticket list, bucketed by status instead. Segments and legend rows both
-          dispatch <code className="panel-note-inline">statusFilterChanged</code>, which is why
+          dispatch <code className="panel-note-inline code-chip code-chip--sm">statusFilterChanged</code>, which is why
           the table below reacts to either one.
         </PanelNote>
       </header>
