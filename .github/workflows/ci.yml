@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [ master, main, '**' ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install server and client
+        run: npm run install:all
+
+      - name: Typecheck (client)
+        run: npm --prefix client run typecheck
+
+      - name: Run tests (client)
+        run: npm --prefix client test
+
+      - name: Build (client)
+        run: npm --prefix client run build

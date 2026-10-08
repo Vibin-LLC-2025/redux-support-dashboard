@@ -45,16 +45,16 @@ Findings ranked most-severe first. Correctness outranks cleanup, altitude, and h
 
 | # | Finding | File:Line | Category | Status | Notes |
 |---|---------|-----------|----------|--------|-------|
-| 1 | Latency claim contradicts server on GET and DELETE | `client/src/components/BuildNotes.tsx:108` | correctness | TODO | Wrong in both directions; teaching artifact |
-| 2 | `aria-pressed` contradicts the state-encoding `aria-label` | `client/src/App.tsx:61` | accessibility | TODO | Announces state backwards |
-| 3 | Bad stored value becomes `false`, not the fallback | `client/src/features/ui/uiSlice.ts:12` | correctness | TODO | `fallback` param ignored for unrecognized values |
-| 4 | Focus-trap effect re-runs when `onClose` identity changes | `client/src/components/SlideOver.tsx:60` | correctness | TODO | **Latent, not currently reproducible** — see note |
-| 5 | `notesVisibilitySet` is dead, used only by its own test | `client/src/features/ui/uiSlice.ts:42` | simplification | TODO | Delete all three, or wire it up |
-| 6 | `initialState` reads localStorage at module-import time | `client/src/features/ui/uiSlice.ts:32` | altitude | TODO | Forecloses `preloadedState`; causes #7 |
-| 7 | Hand-rolled subscribe+diff vs listener middleware | `client/src/app/store.ts:16` | altitude | TODO | Won't survive a second preference |
-| 8 | Persistence round-trip has zero coverage | `client/src/features/ui/uiSlice.test.ts:8` | test-coverage | TODO | Blocked on #6 (needs a hydration seam) |
-| 9 | Mono code-chip recipe duplicated across four rules | `client/src/index.css:176` | reuse | TODO | Collapse to one `.code-chip` base |
-| 10 | Comment says two topbar buttons; this diff added a third | `client/src/index.css:792` | comment-hygiene | TODO | Stale on arrival |
+| 1 | Latency claim contradicts server on GET and DELETE | `client/src/components/BuildNotes.tsx:108` | correctness | Fixed | Copy now lists which routes have latency |
+| 2 | `aria-pressed` contradicts the state-encoding `aria-label` | `client/src/App.tsx:61` | accessibility | Fixed | Button name is static: "Inline build notes" |
+| 3 | Bad stored value becomes `false`, not the fallback | `client/src/features/ui/uiSlice.ts:12` | correctness | Fixed | Unrecognized values now fall back |
+| 4 | Focus-trap effect re-runs when `onClose` identity changes | `client/src/components/SlideOver.tsx:60` | correctness | TODO | Latent; left for a follow-up change |
+| 5 | `notesVisibilitySet` is dead, used only by its own test | `client/src/features/ui/uiSlice.ts:42` | simplification | Fixed | Action and test removed |
+| 6 | `initialState` reads localStorage at module-import time | `client/src/features/ui/uiSlice.ts:32` | altitude | Fixed | Hydrated via `preloadedState` in `store.ts` |
+| 7 | Hand-rolled subscribe+diff vs listener middleware | `client/src/app/store.ts:16` | altitude | Fixed | Replaced with RTK listener middleware |
+| 8 | Persistence round-trip has zero coverage | `client/src/features/ui/uiSlice.test.ts:8` | test-coverage | Fixed | Added jsdom env + round-trip tests |
+| 9 | Mono code-chip recipe duplicated across four rules | `client/src/index.css:176` | reuse | Fixed | New `.code-chip` base + size modifiers |
+| 10 | Comment says two topbar buttons; this diff added a third | `client/src/index.css:792` | comment-hygiene | Fixed | Comment generalized |
 
 ---
 
@@ -312,3 +312,4 @@ Checked during the review and found correct. Recorded so they are not re-litigat
 | Date | Change | Author |
 |------|--------|--------|
 | 2026-07-17 | Initial document created — `xhigh` code review of `1944e90`, 10 findings, all TODO | Claude |
+| 2026-10-08 | Findings 1–3, 5–10 fixed; #4 left as TODO (latent) | Maintenance |
