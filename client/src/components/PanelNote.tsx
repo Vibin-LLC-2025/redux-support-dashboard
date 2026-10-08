@@ -13,7 +13,7 @@ export function PanelNote({ api, children }: { api: string; children: React.Reac
     <p className="panel-note">
       <InfoIcon className="panel-note-icon" />
       <span>
-        <code className="panel-note-api">{api}</code> — {children}
+        <code className="panel-note-api code-chip code-chip--sm">{api}</code> — {children}
       </span>
     </p>
   );

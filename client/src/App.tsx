@@ -58,7 +58,7 @@ export default function App() {
             data-active={notesVisible}
             onClick={() => dispatch(notesToggled())}
             aria-pressed={notesVisible}
-            aria-label={notesVisible ? "Hide inline build notes" : "Show inline build notes"}
+            aria-label="Inline build notes"
           >
             {notesVisible ? <EyeIcon /> : <EyeOffIcon />}
             <span className="btn-label">Notes</span>

@@ -21,7 +21,7 @@ export function BacklogChart() {
         <p className="chart-sub">Active tickets (not yet resolved) · click to filter</p>
         <PanelNote api="selectBacklogByPriority">
           A memoized selector buckets the tickets by priority. Clicking a bar dispatches{" "}
-          <code className="panel-note-inline">priorityFilterChanged</code> — the chart is a
+          <code className="panel-note-inline code-chip code-chip--sm">priorityFilterChanged</code> — the chart is a
           control, not just a picture.
         </PanelNote>
       </header>

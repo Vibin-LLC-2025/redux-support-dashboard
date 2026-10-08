@@ -1,15 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
-import type { PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../../app/store";
 
 const STORAGE_KEY = "supportdesk.notesVisible";
 
 // Guarded so the reducer stays usable under the node test environment, where
 // there is no localStorage.
-function readStoredPreference(fallback: boolean): boolean {
+export function readStoredPreference(fallback: boolean): boolean {
   try {
     const raw = globalThis.localStorage?.getItem(STORAGE_KEY);
-    return raw === null || raw === undefined ? fallback : raw === "true";
+    if (raw === null || raw === undefined) return fallback;
+    if (raw === "true") return true;
+    if (raw === "false") return false;
+    // Unrecognized content falls back rather than coercing to false.
+    return fallback;
   } catch {
     return fallback;
   }
@@ -29,7 +32,8 @@ interface UiState {
 }
 
 const initialState: UiState = {
-  notesVisible: readStoredPreference(true),
+  // Default; actual hydration occurs via store preloadedState in app/store.ts.
+  notesVisible: true,
 };
 
 const uiSlice = createSlice({
@@ -39,13 +43,10 @@ const uiSlice = createSlice({
     notesToggled(state) {
       state.notesVisible = !state.notesVisible;
     },
-    notesVisibilitySet(state, action: PayloadAction<boolean>) {
-      state.notesVisible = action.payload;
-    },
   },
 });
 
-export const { notesToggled, notesVisibilitySet } = uiSlice.actions;
+export const { notesToggled } = uiSlice.actions;
 
 export const selectNotesVisible = (state: RootState) => state.ui.notesVisible;
 

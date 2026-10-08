@@ -1,7 +1,25 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, createListenerMiddleware } from "@reduxjs/toolkit";
 import ticketsReducer from "../features/tickets/ticketsSlice";
 import filtersReducer from "../features/filters/filtersSlice";
-import uiReducer, { persistNotesVisible } from "../features/ui/uiSlice";
+import uiReducer, {
+  persistNotesVisible,
+  readStoredPreference,
+  notesToggled,
+} from "../features/ui/uiSlice";
+
+// Hydrate persisted UI preference at store creation time.
+const preloadedUi = { notesVisible: readStoredPreference(true) };
+
+const listenerMiddleware = createListenerMiddleware();
+
+// Persist the preference when it changes via the toggle action.
+listenerMiddleware.startListening({
+  actionCreator: notesToggled,
+  effect: async (_action, api) => {
+    const visible = (api.getState() as RootState).ui.notesVisible;
+    persistNotesVisible(visible);
+  },
+});
 
 export const store = configureStore({
   reducer: {
@@ -9,16 +27,10 @@ export const store = configureStore({
     filters: filtersReducer,
     ui: uiReducer,
   },
-});
-
-// Mirror the one persisted preference back to localStorage on change.
-let lastNotesVisible = store.getState().ui.notesVisible;
-store.subscribe(() => {
-  const { notesVisible } = store.getState().ui;
-  if (notesVisible !== lastNotesVisible) {
-    lastNotesVisible = notesVisible;
-    persistNotesVisible(notesVisible);
-  }
+  preloadedState: {
+    ui: preloadedUi,
+  },
+  middleware: (getDefault) => getDefault().prepend(listenerMiddleware.middleware),
 });
 
 // Inferred types keep the store as the single source of truth for shape.
